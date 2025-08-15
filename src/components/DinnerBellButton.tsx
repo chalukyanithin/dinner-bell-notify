@@ -2,28 +2,39 @@ import { Button } from "@/components/ui/button";
 import { Bell, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
+import { useBellRinger } from "@/hooks/useBellRinger";
 
 const DinnerBellButton = () => {
   const [isRinging, setIsRinging] = useState(false);
   const [justRang, setJustRang] = useState(false);
+  const { ringBell } = useBellRinger();
 
   const handleRingBell = async () => {
     if (isRinging) return;
     
     setIsRinging(true);
     
-    // Show immediate feedback
-    toast({
-      title: "🔔 Dinner Bell Ringing!",
-      description: "Nithin will be notified that dinner is ready.",
-    });
+    // Ring the bell across all devices
+    const success = await ringBell();
+    
+    if (success) {
+      toast({
+        title: "🔔 Dinner Bell Ringing!",
+        description: "All devices will be notified that dinner is ready.",
+      });
+    } else {
+      toast({
+        title: "❌ Connection Error",
+        description: "Failed to ring bell. Check your internet connection.",
+        variant: "destructive"
+      });
+    }
 
-    // Simulate bell ringing animation
+    // Animation feedback
     setTimeout(() => {
       setIsRinging(false);
       setJustRang(true);
       
-      // Reset the "just rang" state after 3 seconds
       setTimeout(() => {
         setJustRang(false);
       }, 3000);
